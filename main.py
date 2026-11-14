@@ -62,6 +62,43 @@ def generate_random_grid(nb_cells, seed):
     return [[rng.choice([0, 1]) for _ in range(nb_cells)] for _ in range(nb_cells)]
 
 
+def parse_grid(text):
+    """Convertir le texte lu sur STDIN en grille, ou lever ValueError."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        raise ValueError("la grille est vide")
+
+    try:
+        size = int(lines[0])
+    except ValueError:
+        raise ValueError(f"la taille « {lines[0]} » n'est pas un entier") from None
+    if size <= 0:
+        raise ValueError(f"la taille doit être strictement positive (reçu : {size})")
+
+    rows = lines[1:]
+    if len(rows) != size:
+        raise ValueError(f"{size} lignes attendues, {len(rows)} reçues")
+
+    grid = []
+    for row_number, row in enumerate(rows, start=1):
+        cells = row.split()
+        if len(cells) != size:
+            raise ValueError(
+                f"ligne {row_number} : {size} cellules attendues, {len(cells)} reçues")
+        for cell in cells:
+            if cell not in ("0", "1"):
+                raise ValueError(f"ligne {row_number} : cellule invalide « {cell} » (0 ou 1)")
+        grid.append([int(cell) for cell in cells])
+    return grid
+
+
+def read_grid_from_stdin():
+    """Lire la grille initiale sur STDIN si une entrée est redirigée, sinon None."""
+    if sys.stdin is None or sys.stdin.isatty():
+        return None
+    return parse_grid(sys.stdin.read())
+
+
 def count_neighbors(grid, row, col, periodic):
     """Compter les voisines vivantes de la cellule (row, col)."""
     size = len(grid)
@@ -113,7 +150,14 @@ def run_image(grid, max_iterations, periodic, directory):
 
 def main():
     args = parse_arguments()
-    grid = generate_random_grid(args.nb_cells, args.seed)
+
+    try:
+        grid = read_grid_from_stdin()
+    except ValueError as exc:
+        error(f"grille invalide : {exc}")
+    if grid is None:
+        grid = generate_random_grid(args.nb_cells, args.seed)
+
     run_image(grid, args.max_iterations, args.periodic, args.output_directory)
 
 
