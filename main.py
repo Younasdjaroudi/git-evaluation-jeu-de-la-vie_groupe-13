@@ -50,18 +50,22 @@ def parse_arguments(argv=None):
     return parser.parse_args(argv)
 
 
+def generate_random_grid(nb_cells, seed):
+    """Créer une grille carrée aléatoire reproductible à partir de seed."""
+    rng = random.Random(seed)
+    return [[rng.choice([0, 1]) for _ in range(nb_cells)] for _ in range(nb_cells)]
+
+
+def write_image(grid, directory, iteration):
+    """Écrire l'image PNG d'une génération dans directory."""
+    write_grid(matrix=grid, filename=Path(directory) / f"grid_{iteration:04d}.png")
+
 
 def main():
     args = parse_arguments()
-
-    rng = random.Random(args.seed)
-    matrix = [
-        [rng.choice([0, 1]) for _ in range(args.nb_cells)]
-        for _ in range(args.nb_cells)
-    ]
-
-    filename = Path(args.output_directory) / "grid_0000.png"
-    write_grid(matrix=matrix, filename=filename)
+    grid = generate_random_grid(args.nb_cells, args.seed)
+    Path(args.output_directory).mkdir(parents=True, exist_ok=True)
+    write_image(grid, args.output_directory, 0)
 
 
 if __name__ == "__main__":
