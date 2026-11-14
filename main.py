@@ -50,10 +50,47 @@ def parse_arguments(argv=None):
     return parser.parse_args(argv)
 
 
+def error(message):
+    """Écrire message sur STDERR et quitter avec le code 1."""
+    print(f"Erreur : {message}", file=sys.stderr)
+    sys.exit(1)
+
+
 def generate_random_grid(nb_cells, seed):
     """Créer une grille carrée aléatoire reproductible à partir de seed."""
     rng = random.Random(seed)
     return [[rng.choice([0, 1]) for _ in range(nb_cells)] for _ in range(nb_cells)]
+
+
+def count_neighbors(grid, row, col, periodic):
+    """Compter les voisines vivantes de la cellule (row, col)."""
+    size = len(grid)
+    count = 0
+    for d_row in (-1, 0, 1):
+        for d_col in (-1, 0, 1):
+            if d_row == 0 and d_col == 0:
+                continue
+            r, c = row + d_row, col + d_col
+            if periodic:
+                r, c = r % size, c % size
+            elif not (0 <= r < size and 0 <= c < size):
+                continue
+            count += grid[r][c]
+    return count
+
+
+def next_generation(grid, periodic):
+    """Calculer la génération suivante sans modifier la grille courante."""
+    size = len(grid)
+    new_grid = []
+    for row in range(size):
+        new_row = []
+        for col in range(size):
+            neighbors = count_neighbors(grid, row, col, periodic)
+            alive = grid[row][col] == 1
+            new_row.append(1 if neighbors == 3 or (alive and neighbors == 2) else 0)
+        new_grid.append(new_row)
+    return new_grid
 
 
 def write_image(grid, directory, iteration):
@@ -61,11 +98,23 @@ def write_image(grid, directory, iteration):
     write_grid(matrix=grid, filename=Path(directory) / f"grid_{iteration:04d}.png")
 
 
+def run_image(grid, max_iterations, periodic, directory):
+    """Écrire une image par génération, de 0 à max_iterations."""
+    try:
+        Path(directory).mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        error(f"impossible de créer le dossier « {directory} » : {exc.strerror}")
+    write_image(grid, directory, 0)
+    for iteration in range(1, max_iterations + 1):
+        grid = next_generation(grid, periodic)
+        write_image(grid, directory, iteration)
+    print(f"Generation of {max_iterations + 1} images in directory {directory}")
+
+
 def main():
     args = parse_arguments()
     grid = generate_random_grid(args.nb_cells, args.seed)
-    Path(args.output_directory).mkdir(parents=True, exist_ok=True)
-    write_image(grid, args.output_directory, 0)
+    run_image(grid, args.max_iterations, args.periodic, args.output_directory)
 
 
 if __name__ == "__main__":
