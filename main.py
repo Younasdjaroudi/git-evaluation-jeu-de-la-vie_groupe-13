@@ -130,6 +130,13 @@ def next_generation(grid, periodic):
     return new_grid
 
 
+def format_grid(grid, iteration):
+    """Mettre en forme une grille pour la sortie texte."""
+    lines = [f"iteration: {iteration}"]
+    lines += [" ".join(str(cell) for cell in row) for row in grid]
+    return "\n".join(lines)
+
+
 def write_image(grid, directory, iteration):
     """Écrire l'image PNG d'une génération dans directory."""
     write_grid(matrix=grid, filename=Path(directory) / f"grid_{iteration:04d}.png")
@@ -148,6 +155,13 @@ def run_image(grid, max_iterations, periodic, directory):
     print(f"Generation of {max_iterations + 1} images in directory {directory}")
 
 
+def run_text(grid, max_iterations, periodic):
+    """Afficher sur STDOUT uniquement la dernière génération demandée."""
+    for _ in range(max_iterations):
+        grid = next_generation(grid, periodic)
+    print(format_grid(grid, max_iterations))
+
+
 def main():
     args = parse_arguments()
 
@@ -158,7 +172,10 @@ def main():
     if grid is None:
         grid = generate_random_grid(args.nb_cells, args.seed)
 
-    run_image(grid, args.max_iterations, args.periodic, args.output_directory)
+    if args.output_type == "text":
+        run_text(grid, args.max_iterations, args.periodic)
+    else:
+        run_image(grid, args.max_iterations, args.periodic, args.output_directory)
 
 
 if __name__ == "__main__":
