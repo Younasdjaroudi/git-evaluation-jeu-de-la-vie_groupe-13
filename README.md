@@ -120,3 +120,21 @@ sh check_tests.sh            # Nb test success: 82 / 82
 | `-h` | `--help` | affiche l'aide du programme | — |
 
 La génération initiale porte le numéro `0` : avec `-m 20`, le programme calcule 21 générations. Lorsqu'une grille est fournie sur l'entrée standard, les options `-n` et `-s` n'ont pas d'effet.
+
+## Vidéos
+
+### Simulation du jeu de la vie
+
+Vidéo : https://www.youtube.com/watch?v=tKlZ9XLMZsA
+
+Elle a été produite avec une grille de 50×50 cellules, la **graine 4200**, 2000 itérations et des conditions aux limites fixes, à 20 images par seconde (durée : 1 min 40 s). Commandes exactes :
+
+```bash
+mkdir -p outputs/video-seed-4200
+python3 main.py --nb_cells 50 --max_iterations 2000 --seed 4200 \
+  --output_type image --output_directory outputs/video-seed-4200
+ffmpeg -y -framerate 20 -start_number 0 \
+  -i outputs/video-seed-4200/grid_%04d.png -frames:v 2001 \
+  -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
+  outputs/video-seed-4200/game-of-life.mp4
+```
