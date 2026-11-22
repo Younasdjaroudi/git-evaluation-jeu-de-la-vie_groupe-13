@@ -138,3 +138,27 @@ ffmpeg -y -framerate 20 -start_number 0 \
   -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
   outputs/video-seed-4200/game-of-life.mp4
 ```
+
+## Intégration continue
+
+Le workflow [`.github/workflows/tests.yml`](.github/workflows/tests.yml) lance `check_script_options.sh` et `check_tests.sh` sur Ubuntu à chaque `push` et à chaque *Pull Request*.
+
+Exemple d'exécution réussie : https://github.com/Younasdjaroudi/git-evaluation-jeu-de-la-vie_groupe-13/actions/runs/45013053211
+
+## Auteurs
+
+| Nom | Prénom | Numéro étudiant |
+|---|---|---|
+| DJAROUDI | Younas | 45004854 |
+
+## Liens utiles
+
+- [Jeu de la vie](https://fr.wikipedia.org/wiki/Jeu_de_la_vie) : présentation des règles du jeu de Conway,
+- [Documentation argparse](https://docs.python.org/fr/3/library/argparse.html) : analyse des arguments d'un script Python,
+- [Documentation random](https://docs.python.org/fr/3/library/random.html) : génération de grilles aléatoires reproductibles,
+- [Pipeline (Unix)](https://en.wikipedia.org/wiki/Pipeline_(Unix)) : description du pipe,
+- [Workshop 3 : rebase et historique final](https://github.com/frozar/git-workshop-3) : organisation Git attendue pour ce projet,
+- [Documentation officielle de git rebase](https://git-scm.com/book/fr/v2/Les-branches-avec-Git-Rebaser-Rebasing) : fonctionnement du *rebase*,
+- [Documentation GitHub Actions](https://docs.github.com/fr/actions) : mise en place de l'intégration continue,
+- [Documentation ffmpeg](https://ffmpeg.org/documentation.html) : assemblage des images en vidéo,
+- [Site officiel de Gource](https://gource.io/) : visualisation de l'historique du dépôt.
