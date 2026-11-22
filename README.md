@@ -139,6 +139,21 @@ ffmpeg -y -framerate 20 -start_number 0 \
   outputs/video-seed-4200/game-of-life.mp4
 ```
 
+### Historique du dépôt (Gource)
+
+Vidéo : https://www.youtube.com/watch?v=FnyRCb6A1qk
+
+Elle a été générée depuis la racine du dépôt avec :
+
+```bash
+gource -s 2 -r 60 --file-font-size 8 \
+  --title 'Jeu de la vie' --filename-time 2 \
+  --stop-at-end --hide date,usernames -o gource.ppm
+ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i gource.ppm \
+  -vcodec libx264 -preset medium -pix_fmt yuv420p \
+  -crf 18 -threads 0 -bf 0 gource.mp4
+```
+
 ## Intégration continue
 
 Le workflow [`.github/workflows/tests.yml`](.github/workflows/tests.yml) lance `check_script_options.sh` et `check_tests.sh` sur Ubuntu à chaque `push` et à chaque *Pull Request*.
